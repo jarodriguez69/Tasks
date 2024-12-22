@@ -13,8 +13,9 @@ class Task extends Model
     use HasFactory;
     use SoftDeletes;
     protected $fillable = [
-        'name',
-        'description'
+        'title',
+        'description',
+        'user_id'
     ];
     
     public function users():BelongsTo

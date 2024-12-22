@@ -20,12 +20,14 @@ class TaskComponent extends Component
     public $users = [];
     public $user_id;
     public $permiso;
+
     public function mount()
     {
         $this->tasks = $this->getTasks()->sortByDesc('id');
         $this->users = User::where('id','!=', auth()->user()->id)->get();
 
     }
+    
     public function getTasks()
     {
         $user = auth()->user();
@@ -34,6 +36,7 @@ class TaskComponent extends Component
         return $misSharedTasks->merge($misTareas);
         
     }
+
     public function renderAllTasks()
     {
         $this->tasks = $this->getTasks()->sortByDesc('id');
@@ -80,6 +83,7 @@ class TaskComponent extends Component
     {
         if ($this->miTarea->id)
         {
+          
             $task = Task::find($this->miTarea->id);
             $task->update(
                 [
@@ -89,8 +93,9 @@ class TaskComponent extends Component
         }
         else
         {
+            
             $task= Task::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' =>  auth()->user()->id,
                     'title' => $this->title,
                     'description' => $this->description
                 ]);

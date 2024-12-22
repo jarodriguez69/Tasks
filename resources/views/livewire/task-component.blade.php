@@ -1,8 +1,8 @@
 <section wire:poll="renderAllTasks">
 <button class="inline-flex w-full justify-center rounded-md bg-purple-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 sm:ml-3 sm:w-auto" wire:click='openCreateModal'>Nuevo</button>
-                <table class="border-collapse table-auto w-full text-sm">
+                <table class="table-auto w-full">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
                         <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Titulo</th>
                         <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Descripción</th>
                         <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Acciones</th>
@@ -10,7 +10,7 @@
                     </thead>
                     <tbody class="bg-white dark:bg-slate-800">
                     @foreach($tasks as $task)
-                        <tr>
+                        <tr class="text-center">
                             <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">{{$task->title}}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">{{$task->description}}</td>
                             <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
