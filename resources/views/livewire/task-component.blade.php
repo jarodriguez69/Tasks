@@ -1,34 +1,83 @@
 <section wire:poll="renderAllTasks">
-<button class="inline-flex w-full justify-center rounded-md bg-purple-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 sm:ml-3 sm:w-auto" wire:click='openCreateModal'>Nuevo</button>
-                <table class="table-auto w-full">
-                    <thead>
-                        <tr class="text-center">
-                        <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Titulo</th>
-                        <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Descripción</th>
-                        <th class="border-b bg-green-800 dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-slate-800">
-                    @foreach($tasks as $task)
-                        <tr class="text-center">
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">{{$task->title}}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">{{$task->description}}</td>
-                            <td class="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
-                                @if((isset($task->pivot)))
-                                  <button wire:click="taskUnshared({{ $task }})" class="bg-blue-800 text white"> Descompartir</button>
-                                @endif
-                                @if((isset($task->pivot) && $task->pivot->permission == 'edit') || auth()->user()->id == $task->user_id)
-                                  <button wire:click="openCreateModal({{ $task }})" class="bg-yellow-800 text white"> Editar</button>
-                                  <button wire:click="openShareModal({{ $task }})" class="bg-purple-800 text white"> Compartir</button>
-                                  <button class="bg-red-800 text white" wire:click="deleteTask({{ $task }})"> Borrar</button>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                       
-                    
-                    </tbody>
-                </table>
+
+<div class="flex justify-end">
+  <button class="inline-flex items-center justify-center w-10 h-10 mr-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" wire:click='openCreateModal'>
+    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+      <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" fill-rule="evenodd"></path>
+    </svg>
+  </button>
+</div>
+
+<!-- component -->
+<div class="mx-auto">
+    
+    <div class="w-full flex justify-between items-center mb-3 mt-12 pl-3">
+        <div>
+            <h3 class="text-lg font-semibold text-slate-800">Tareas</h3>
+            <!-- <p class="text-slate-500">Review your selected items.</p> -->
+        </div>
+        <div class="mx-3">
+            <div class="w-full max-w-sm min-w-[200px] relative">
+            <div class="relative">
+                <input
+                class="bg-white w-full pr-11 h-10 pl-3 py-2 bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"
+                placeholder="Buscar..."
+                />
+                <button
+                class="absolute h-8 w-8 right-1 top-1 my-auto px-2 flex items-center bg-white rounded "
+                type="button"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8 text-slate-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                </button>
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr class="border-b border-slate-300 bg-slate-50">
+            <th class="p-4 text-sm font-normal leading-none text-slate-500">ID</th>
+            <th class="p-4 text-sm font-normal leading-none text-slate-500">Nombre</th>
+            <th class="p-4 text-sm font-normal leading-none text-slate-500">Descripci&oacute;n</th>
+            <th class="p-4 text-sm font-normal leading-none text-slate-500"></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach($tasks as $task)
+          <tr class="hover:bg-slate-50">
+              <td class="p-4 border-b border-slate-200 py-5">
+              <p class="text-sm text-slate-500">{{$task->id}}</p>
+              </td>
+              <td class="p-4 border-b border-slate-200 py-5">
+              <p class="block font-semibold text-sm text-slate-800">{{$task->title}}</p>
+              </td>
+              <td class="p-4 border-b border-slate-200 py-5">
+              <p class="text-sm text-slate-500">{{$task->description}}</p>
+              </td>
+              <td class="p-4 border-b border-slate-200 py-5">
+                @if((isset($task->pivot)))
+                  <button wire:click="taskUnshared({{ $task }})" class="bg-blue-800 text white"> Descompartir</button>
+                @endif
+                @if((isset($task->pivot) && $task->pivot->permission == 'edit') || auth()->user()->id == $task->user_id)
+                  
+                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-green-600 rounded-lg focus:shadow-outline hover:bg-green-700" wire:click="openCreateModal({{ $task }})">Editar</button>
+                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-yellow-600 rounded-lg focus:shadow-outline hover:bg-yellow-700" wire:click="openShareModal({{ $task }})">Compartir</button>
+                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-red-600 rounded-lg focus:shadow-outline hover:bg-red-700" wire:click="deleteTask({{ $task }})">Borrar</button>
+                @endif
+              
+              </td>
+          </tr>
+        @endforeach
+        
+        </tbody>
+    </table>
+    </div>
+</div>
 
 
 @if($modal)                
