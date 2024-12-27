@@ -4,11 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\State;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class TaskComponent extends Component
 {
-
+    use WithPagination;
     public $tasks = [];
     public $id;
     public $title;
@@ -20,18 +22,22 @@ class TaskComponent extends Component
     public $users = [];
     public $user_id;
     public $permiso;
+    public $search="";
+    public $states;
+    public $state_id;
 
     public function mount()
     {
         $this->tasks = $this->getTasks()->sortByDesc('id');
         $this->users = User::where('id','!=', auth()->user()->id)->get();
-
+        $this->states = State::all();
+        $this->user_id = auth()->user()->id;
     }
     
     public function getTasks()
     {
         $user = auth()->user();
-        $misTareas = Task::where('user_id', auth()->user()->id)->get();
+        $misTareas = Task::where('user_id', auth()->user()->id)->where('title', 'like', '%'.$this->search.'%')->get();
         $misSharedTasks = $user->sharedTasks()->get();
         return $misSharedTasks->merge($misTareas);
         
@@ -40,6 +46,7 @@ class TaskComponent extends Component
     public function renderAllTasks()
     {
         $this->tasks = $this->getTasks()->sortByDesc('id');
+        
     }
 
     public function render()
@@ -47,14 +54,6 @@ class TaskComponent extends Component
         return view('livewire.task-component');
     }
 
-    public function clearFields()
-    {
-        $this->title='';
-        $this->description='';
-        $this->id='';
-        $this->miTarea=null;
-        $this->isUpdating = false;
-    }
 
     public function openCreateModal(Task $task =null)
     {
@@ -93,19 +92,10 @@ class TaskComponent extends Component
         }
         else
         {
-            
-            $task= Task::create([
-                    'user_id' =>  auth()->user()->id,
-                    'title' => $this->title,
-                    'description' => $this->description
-                ]);
+            $task= Task::create( $this->only('user_id', 'title', 'description', 'state_id'));
         }
 
-        
-        
-
-    
-        $this->clearFields();
+        $this->reset(['title', 'description']);
         $this->modal=false;
         $this->tasks = $this->getTasks()->sortByDesc('id');
     }

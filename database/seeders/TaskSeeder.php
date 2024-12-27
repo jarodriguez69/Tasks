@@ -17,10 +17,9 @@ class TaskSeeder extends Seeder
     {
         $task = new Task();
         $task->title = 'Task 1';
-        $task->description = 'This is a Task 1';
+        $task->description = 'This is a Task ';
         $task->user_id = User::find(1)->id;
         $task->state_id = State::find(1)->id;
         $task->save();
-
     }
 }

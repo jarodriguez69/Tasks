@@ -15,15 +15,14 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
-        'user_id'
+        'user_id',
+        'state_id'
     ];
     
     public function users():BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-
-
 
     public function sharedUser():BelongsToMany
     {
