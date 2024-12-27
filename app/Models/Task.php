@@ -23,8 +23,15 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+
+
     public function sharedUser():BelongsToMany
     {
         return $this->belongsToMany(User::class, 'task_user')->withPivot('permission');
+    }
+
+    //Relacion uno a mucho inversa
+    public function taskstate(){
+        return $this->belongsTo(State::class);
     }
 }

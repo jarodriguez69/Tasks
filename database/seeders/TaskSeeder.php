@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\State;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +19,7 @@ class TaskSeeder extends Seeder
         $task->title = 'Task 1';
         $task->description = 'This is a Task 1';
         $task->user_id = User::find(1)->id;
+        $task->state_id = State::find(1)->id;
         $task->save();
 
     }

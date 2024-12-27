@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->unsignedBigInteger('user_id')->unsigned();
+            $table->unsignedBigInteger('state_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
