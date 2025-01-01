@@ -26,6 +26,15 @@ class TaskComponent extends Component
     public $states;
     public $state_id;
 
+    public $open=false;
+    public $taskEdit=[
+        'title' => '',
+        'description' => '',
+        'state_id' => ''
+    ];
+
+    
+
     public function mount()
     {
         $this->tasks = $this->getTasks()->sortByDesc('id');
@@ -53,6 +62,19 @@ class TaskComponent extends Component
     {
         return view('livewire.task-component');
     }
+
+    public function edit(Task $task)
+    {
+        $this->open = true;
+        $this->miTarea = $task;
+        $this->title = $task->title;
+        $this->description = $task->description;
+        $this->state_id = $task->state_id;
+    }
+
+
+
+
 
 
     public function openCreateModal(Task $task =null)
