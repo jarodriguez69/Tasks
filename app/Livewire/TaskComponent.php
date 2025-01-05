@@ -27,12 +27,14 @@ class TaskComponent extends Component
     public $state_id;
 
     public $open=false;
+    public $createModal=false;
     public $taskEdit=[
         'title' => '',
         'description' => '',
         'state_id' => ''
     ];
 
+    public $taskEditId = null;
     
 
     public function mount()
@@ -66,35 +68,76 @@ class TaskComponent extends Component
     public function edit(Task $task)
     {
         $this->open = true;
-        $this->miTarea = $task;
-        $this->title = $task->title;
-        $this->description = $task->description;
-        $this->state_id = $task->state_id;
+        $this->taskEditId = $task->id;
+        $this->taskEdit['title'] = $task->title;
+        $this->taskEdit['description'] = $task->description;
+        $this->taskEdit['state_id'] = $task->state_id;
     }
 
-
-
-
-
-
-    public function openCreateModal(Task $task =null)
+    public function update()
     {
-        if($task)
-        {
-            $this->isUpdating = true;
-            $this->miTarea=$task;
-            $this->title=$task->title;
-            $this->description=$task->description;
-            $this->id=$task->id;
-            
-        }
-        else
-        {
-            $this->clearFields();
-        }
+       
+        $this->validate([
+            'taskEdit.title' => 'required',
+            'taskEdit.description' => 'required',
+            'taskEdit.state_id' => 'required'
+        ]);
         
-        $this->modal=true;
+        $task = Task::find($this->taskEditId);
+        
+        $task->update([
+            'title' => $this->taskEdit['title'],
+            'description' => $this->taskEdit['description'],
+            'state_id' => $this->taskEdit['state_id']
+        ]);
+
+        $this->tasks = $this->getTasks()->sortByDesc('id');
+        $this->reset(['taskEdit', 'taskEditId', 'open']);
     }
+
+    public function destroy(Task $task)
+    {
+        $task->delete();
+        $this->tasks = $this->getTasks()->sortByDesc('id');
+    }
+    
+    public function create()
+    {
+        $this->createModal=true;
+    }
+
+    public function save()
+    {
+        $this->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'state_id' => 'required'
+        ]);
+
+        $task = Task::create([
+            'title' => $this->title,
+            'description' => $this->description,
+            'state_id' => $this->state_id,
+            'user_id' => $this->user_id
+        ]);
+
+        $task->save();
+
+        $this->tasks = $this->getTasks()->sortByDesc('id');
+        $this->reset(['title', 'description', 'state_id','createModal']);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     public function closeCreateModal()
     {
         $this->modal=false;

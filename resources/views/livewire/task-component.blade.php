@@ -1,7 +1,7 @@
 <section wire:poll="renderAllTasks">
 
 <div class="flex justify-end">
-  <button class="inline-flex items-center justify-center w-10 h-10 mr-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" wire:click='openCreateModal'>
+  <button class="inline-flex items-center justify-center w-10 h-10 mr-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" wire:click='create'>
     <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
       <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" fill-rule="evenodd"></path>
     </svg>
@@ -60,8 +60,8 @@
                 @if((isset($task->pivot) && $task->pivot->permission == 'edit') || auth()->user()->id == $task->user_id)
                   
                   <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-green-600 rounded-lg focus:shadow-outline hover:bg-green-700" wire:click="edit({{ $task }})">Editar</button>
-                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-yellow-600 rounded-lg focus:shadow-outline hover:bg-yellow-700" wire:click="openShareModal({{ $task }})">Compartir</button>
-                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-red-600 rounded-lg focus:shadow-outline hover:bg-red-700" wire:click="deleteTask({{ $task }})">Borrar</button>
+                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-yellow-600 rounded-lg focus:shadow-outline hover:bg-yellow-700" wire:click="openShareModal({{ $task->id }})">Compartir</button>
+                  <button class="h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-red-600 rounded-lg focus:shadow-outline hover:bg-red-700" wire:click="destroy({{ $task->id }})">Borrar</button>
                 @endif
               
               </td>
@@ -74,49 +74,82 @@
     
     </div>
     
-    @if ($open)
-      <!-- Create Task Modal -->
-      <div class="fixed inset-0 bg-gray-800 bg-opacity-50">
-          <div class="py-12">
-            <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">    
-                      <form wire:submit='update'>
-                        <div class="mb-4">
-                            <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Titulo</label>
-                            <x-text-input autofocus wire:model="title" type="text" id="title" name="title"> </x-text-input>
-                           
-                        </div>
-                        <div>
-                            <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Descripción</label>
-                            <x-text-input wire:model="description" type="text" id="description" name="description"> </x-text-input>
-                            
-                        </div>
-                        <div>
-                            <label for="state_id" class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
-                            <select wire:model="state_id" >
-                              <option value="">Seleccione un Estado</option>
-                              @foreach($states as $state)
-                                <option value="{{$state->id}}">{{$state->name}}</option>
-                              @endforeach
-                            </select>
-                        </div>
-                        <div class="flex justify-end mt-4">
-                          <x-primary-button> Actualizar</x-primary-button>
-                          <x-secondary-button class="ml-2" wire:click="$set('open',false)"> Cancelar</x-secondary-button>
-                        </div>
-                      </form>
-                  
-
-                    
-                    </div>
-                </div>
-            </div>
-        </div>
+    @if ($createModal)
+    <!-- Create Task Modal -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50">
+        <div class="py-12">
+          <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+              <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                  <div class="p-6 text-gray-900">    
+                    <form wire:submit='save'>
+                      <div class="mb-4">
+                          <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Titulo</label>
+                          <x-text-input autofocus wire:model="title" type="text" id="title" name="title"> </x-text-input>
+                      </div>
+                      <div>
+                          <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Descripción</label>
+                          <x-text-input wire:model="description" type="text" id="description" name="description"></x-text-input>
+                      </div>
+                      <div>
+                          <label for="state_id" class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
+                          <select wire:model="state_id" >
+                            <option value="">Seleccione un Estado</option>
+                            @foreach($states as $state)
+                              <option value="{{$state->id}}">{{$state->name}}</option>
+                            @endforeach
+                          </select>
+                      </div>
+                      <div class="flex justify-end mt-4">
+                        <x-primary-button>Crear</x-primary-button>
+                        <x-secondary-button class="ml-2" wire:click="$set('createModal',false)">Cancelar</x-secondary-button>
+                      </div>
+                    </form>
+                  </div>
+              </div>
+          </div>
       </div>
-    @endif
-      
-    
+    </div>
+  @endif
+
+
+    @if ($open)
+    <!-- Edit Task Modal -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50">
+        <div class="py-12">
+          <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+              <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                  <div class="p-6 text-gray-900">    
+                    <form wire:submit='update'>
+                      <div class="mb-4">
+                          <label for="taskEdit.title" class="block mb-2 text-sm font-medium text-gray-900">Titulo</label>
+                          <x-text-input autofocus wire:model="taskEdit.title" type="text" id="taskEdit.title" name="taskEdit.title"></x-text-input>
+                      </div>
+                      <div>
+                          <label for="taskEdit.description" class="block mb-2 text-sm font-medium text-gray-900">Descripción</label>
+                          <x-text-input wire:model="taskEdit.description" type="text" id="taskEdit.description" name="taskEdit.description"></x-text-input>
+                      </div>
+                      <div>
+                          <label for="taskEdit.state_id" class="block mb-2 text-sm font-medium text-gray-900">Estado</label>
+                          <select wire:model="taskEdit.state_id" >
+                            <option value="">Seleccione un Estado</option>
+                            @foreach($states as $state)
+                              <option value="{{$state->id}}">{{$state->name}}</option>
+                            @endforeach
+                          </select>
+                      </div>
+                      <div class="flex justify-end mt-4">
+                        <x-primary-button>Actualizar</x-primary-button>
+                        <x-secondary-button class="ml-2" wire:click="$set('open',false)">Cancelar</x-secondary-button>
+                      </div>
+                    </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  @endif
+
+
 
 
 </div>
